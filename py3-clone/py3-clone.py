@@ -93,9 +93,10 @@ class DecoratedImage:
     #self.__image.merge_visible_layers(Gimp.MergeType.CLIP_TO_IMAGE)
     self.__overlap = self.__cross_size
 
-  def add_text(self):
-    now = datetime.now()
-    self.__h_text = self.__h_text + " " + now.strftime("%d-%m-%Y")
+  def add_text(self, add_date=True):
+    if add_date:
+      now = datetime.now()
+      self.__h_text = self.__h_text + " " + now.strftime("%d-%m-%Y")
     font = Gimp.Font.get_by_name(FONT_NAME)
     size = FONT_SIZE
     unit = Gimp.Unit.pixel()
@@ -211,7 +212,7 @@ def run(procedure, run_mode, image, drawables, config, data):
     dialog = GimpUi.ProcedureDialog.new(procedure, config, _("Reproduce"))
     format = dialog.get_widget("format", GObject.TYPE_NONE)
     format.set_hexpand(False)
-    box = dialog.fill_box("size-box", ["add_marks", "add_text", "clip_result", "format"])
+    box = dialog.fill_box("size-box", ["add_marks", "add_text", "add_date", "clip_result", "format"])
     dialog.fill_expander("expander", None, False, "size-box")
     box2 = dialog.fill_box("box", ["p_number", "rows_number"])
     box2.set_orientation (Gtk.Orientation.HORIZONTAL)
@@ -228,6 +229,7 @@ def run(procedure, run_mode, image, drawables, config, data):
   r_nbr = config.get_property('rows_number')
   marks = config.get_property('add_marks')
   text = config.get_property('add_text')
+  add_date = config.get_property('add_date')
   format_name = config.get_property('format')
   h_text = config.get_property('h_text')
   v_text = config.get_property('v_text')
@@ -245,7 +247,7 @@ def run(procedure, run_mode, image, drawables, config, data):
   if marks:
     new_image.add_marks()
   if text:
-    new_image.add_text()
+    new_image.add_text(add_date)
   new_canvas = Reproducer(new_image.get_image(), new_image.get_overlap(),
                           canv_width, canv_height)
   if not new_canvas.can_fit_image():
@@ -292,6 +294,8 @@ class Clone (Gimp.PlugIn):
       procedure.add_boolean_argument ("add_marks", _("Add cut marks"), _("Add cut marks"),
                                    True, GObject.ParamFlags.READWRITE)
       procedure.add_boolean_argument ("add_text", _("Add text"), _("Add text"),
+                                   True, GObject.ParamFlags.READWRITE)
+      procedure.add_boolean_argument ("add_date", _("Add date"), _("Add current date to text"),
                                    True, GObject.ParamFlags.READWRITE)
       procedure.add_boolean_argument ("clip_result", _("Clip to result"), _("Clip to result"),
                                    True, GObject.ParamFlags.READWRITE)
