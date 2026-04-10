@@ -17,74 +17,68 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
 "10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: .\py3-clone.py:32
 msgid "Unlimited"
 msgstr "Неограниченно"
 
-#: .\py3-clone.py:211
 msgid "Reproduce"
 msgstr "Размножить"
 
-#: .\py3-clone.py:251
 msgid "The image is too big"
 msgstr "Изображение слишком большое"
 
-#: .\py3-clone.py:265 .\py3-clone.py:256
 msgid "The number of copies has been reduced"
 msgstr "Количество копий было уменьшено"
 
-#: .\py3-clone.py:278
 msgid "Replicates an image within a given format"
 msgstr "Размножает изображение в заданном формате"
 
-#: .\py3-clone.py:283
 msgid "Number of columns"
 msgstr "Количество столбцов"
 
-#: .\py3-clone.py:282
-msgid "clone"
-msgstr "Размножить"
+msgid "Prepare for printing..."
+msgstr "Подготовка к печати..."
 
-#: .\py3-clone.py:283
 msgid "Number of copies / columns"
 msgstr "Количество копий / колонок"
 
-#: .\py3-clone.py:285
 msgid "Number of rows"
 msgstr "Количество строк"
 
-#: .\py3-clone.py:287
 msgid "V. text"
 msgstr "В. текст"
 
-#: .\py3-clone.py:287
 msgid "Vertical text"
 msgstr "Вертикальный текст"
 
-#: .\py3-clone.py:289
 msgid "H. text"
 msgstr "Г. текст"
 
-#: .\py3-clone.py:289
 msgid "Horizontal text"
 msgstr "Горизонтальный текст"
 
-#: .\py3-clone.py:291
 msgid "Add cut marks"
-msgstr "метки для обрезки"
+msgstr "Метки для обрезки"
 
-#: .\py3-clone.py:293
 msgid "Add text"
-msgstr "текст"
+msgstr "Текст"
 
-#: .\py3-clone.py:295
+msgid "Add date"
+msgstr "Дата"
+
+msgid "Add current date to text"
+msgstr "Добавить текущую дату к тексту"
+
 msgid "Clip to result"
-msgstr "кадрировать"
+msgstr "Кадрировать"
 
-#: .\py3-clone.py:297
 msgid "Paper format"
 msgstr "Формат"
 
-#: .\py3-clone.py:299
+msgid "Archive directory"
+msgstr "Папка архива"
+
+msgid "Directory to save archived photos"
+msgstr "Папка для сохранения архивных фотографий"
+
 msgid "<Image>/i_d photo"
 msgstr "<Image>/Фото на документы"

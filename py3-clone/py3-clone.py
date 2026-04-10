@@ -28,18 +28,19 @@ plug_in_binary = "py3-clone"
 
 SAVE_DIR = str(Path.home() / "Desktop" / "arch_photo")
 
-formats = Gimp.Choice.new()
-formats.add("unlimited", 0, _("Unlimited"), "for Unlimited")
-formats.add("A4", 1, "A4", "for A4")
-formats.add("A5", 2, "A5", "for A5")
-formats.add("A6", 3, "A6", "for A6")
+FORMATS = {
+  "unlimited": {"label": _("Unlimited"), "width": 0,   "height": 0},
+  "10x15":     {"label": "10x15 cm",     "width": 100, "height": 150},
+  "13x18":     {"label": "13x18 cm",     "width": 130, "height": 180},
+  "15x20":     {"label": "15x20 cm",     "width": 150, "height": 200},
+  "A6":        {"label": "A6",           "width": 105, "height": 148},
+  "A5":        {"label": "A5",           "width": 148, "height": 210},
+  "A4":        {"label": "A4",           "width": 210, "height": 297},
+}
 
-FORMATS = [
-  (Gimp.MAX_IMAGE_SIZE, Gimp.MAX_IMAGE_SIZE),
-  (210, 297),
-  (148, 210),
-  (105, 148)
-]
+formats = Gimp.Choice.new()
+for i, (nick, info) in enumerate(FORMATS.items()):
+  formats.add(nick, i, info["label"], "")
 
 CROSS_SIZE = 19
 CROSS_COLOR = "black"
@@ -128,8 +129,17 @@ class Reproducer:
     self.__original_image = image
     self.__image = None
     self.__overlap = overlap
-    self.__canv_width = canv_width
-    self.__canv_height = canv_height
+    # Auto-orient canvas to fit more photos
+    img_w = image.get_width() - overlap
+    img_h = image.get_height() - overlap
+    portrait_fit = (canv_width // img_w) * (canv_height // img_h)
+    landscape_fit = (canv_height // img_w) * (canv_width // img_h)
+    if landscape_fit > portrait_fit:
+      self.__canv_width = canv_height
+      self.__canv_height = canv_width
+    else:
+      self.__canv_width = canv_width
+      self.__canv_height = canv_height
 
   def get_image(self):
     if not self.__image:
@@ -201,10 +211,17 @@ def mm_to_px(val):
   return int(val * 11.811)
 
 def get_canv_size(format_nick):
-  i = formats.get_id(format_nick)
-  canv_width = mm_to_px(FORMATS[i][0])
-  canv_height = mm_to_px(FORMATS[i][1])
-  return canv_width, canv_height
+  info = FORMATS[format_nick]
+  if info["width"] == 0:
+    return Gimp.MAX_IMAGE_SIZE, Gimp.MAX_IMAGE_SIZE
+  return mm_to_px(info["width"]), mm_to_px(info["height"])
+
+def update_clip_visibility(config, pspec, data):
+  clip_widget, dialog = data
+  is_format = config.get_property('format') != 'unlimited'
+  clip_widget.set_visible(is_format)
+  if not is_format:
+    dialog.resize(1, 1)
 
 def run(procedure, run_mode, image, drawables, config, data):
   if run_mode == Gimp.RunMode.INTERACTIVE:
@@ -212,13 +229,16 @@ def run(procedure, run_mode, image, drawables, config, data):
     dialog = GimpUi.ProcedureDialog.new(procedure, config, _("Reproduce"))
     format = dialog.get_widget("format", GObject.TYPE_NONE)
     format.set_hexpand(False)
-    box = dialog.fill_box("size-box", ["add_marks", "add_text", "add_date", "clip_result", "format"])
-    dialog.fill_expander("expander", None, False, "size-box")
-    box2 = dialog.fill_box("box", ["p_number", "rows_number"])
-    box2.set_orientation (Gtk.Orientation.HORIZONTAL)
+    clip_widget = dialog.get_widget("clip_result", GObject.TYPE_NONE)
+    box = dialog.fill_box("options-box", ["add_marks", "add_text", "add_date", "clip_result"])
     box.set_spacing(20)
-    box.set_orientation (Gtk.Orientation.HORIZONTAL)
-    dialog.fill(["h_text", "v_text",  "box", "expander", "save_dir"])
+    box.set_orientation(Gtk.Orientation.HORIZONTAL)
+    dialog.fill_expander("expander", None, False, "options-box")
+    box2 = dialog.fill_box("box", ["p_number", "rows_number"])
+    box2.set_orientation(Gtk.Orientation.HORIZONTAL)
+    config.connect("notify::format", update_clip_visibility, (clip_widget, dialog))
+    dialog.fill(["h_text", "v_text", "box", "format", "expander", "save_dir"])
+    clip_widget.set_visible(config.get_property('format') != 'unlimited')
     if not dialog.run():
       dialog.destroy()
       return procedure.new_return_values(Gimp.PDBStatusType.CANCEL, None)
@@ -282,7 +302,7 @@ class Clone (Gimp.PlugIn):
                                    None)
     procedure.set_attribution("Vladislav Lukianenko <majosue@student.42.fr>", "majosue", "2025")
     if name == plug_in_proc:
-      procedure.set_menu_label(_("clone"))
+      procedure.set_menu_label(_("Prepare for printing..."))
       procedure.add_int_argument     ("p_number", _("Number of columns"), _("Number of copies / columns"),
                                       1, 10000, 8, GObject.ParamFlags.READWRITE)
       procedure.add_int_argument     ("rows_number", _("Number of rows"), _("Number of rows"),
@@ -300,7 +320,7 @@ class Clone (Gimp.PlugIn):
       procedure.add_boolean_argument ("clip_result", _("Clip to result"), _("Clip to result"),
                                    True, GObject.ParamFlags.READWRITE)
       procedure.add_choice_argument ("format",  _("Paper format"), _("Paper format"),
-                                   formats, "A4", GObject.ParamFlags.READWRITE)
+                                   formats, "10x15", GObject.ParamFlags.READWRITE)
       procedure.add_string_argument ("save_dir", _("Archive directory"), _("Directory to save archived photos"),
                                    SAVE_DIR, GObject.ParamFlags.READWRITE)
     procedure.add_menu_path (_("<Image>/i_d photo"))
