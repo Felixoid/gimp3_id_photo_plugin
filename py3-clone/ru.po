@@ -71,6 +71,12 @@ msgstr "Добавить текущую дату к тексту"
 msgid "Clip to result"
 msgstr "Кадрировать"
 
+msgid "Clear guides"
+msgstr "Убрать направляющие"
+
+msgid "Remove guides from the output image"
+msgstr "Удалить направляющие из итогового изображения"
+
 msgid "Paper format"
 msgstr "Формат"
 

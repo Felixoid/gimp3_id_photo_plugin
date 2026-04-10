@@ -125,10 +125,11 @@ class DecoratedImage:
     return Gimp.Display.new(self.__image)
 
 class Reproducer:
-  def __init__(self, image, overlap, canv_width, canv_height):
+  def __init__(self, image, overlap, canv_width, canv_height, clear_guides=False):
     self.__original_image = image
     self.__image = None
     self.__overlap = overlap
+    self.__clear_guides = clear_guides
     # Auto-orient canvas to fit more photos
     img_w = image.get_width() - overlap
     img_h = image.get_height() - overlap
@@ -144,6 +145,12 @@ class Reproducer:
   def get_image(self):
     if not self.__image:
       self.__image = self.__original_image.duplicate()
+      if self.__clear_guides:
+        guide = self.__image.find_next_guide(0)
+        while guide != 0:
+          next_guide = self.__image.find_next_guide(guide)
+          self.__image.delete_guide(guide)
+          guide = next_guide
       self.__image.merge_visible_layers(Gimp.MergeType.CLIP_TO_IMAGE)
     return self.__image
 
@@ -230,7 +237,7 @@ def run(procedure, run_mode, image, drawables, config, data):
     format = dialog.get_widget("format", GObject.TYPE_NONE)
     format.set_hexpand(False)
     clip_widget = dialog.get_widget("clip_result", GObject.TYPE_NONE)
-    box = dialog.fill_box("options-box", ["add_marks", "add_text", "add_date", "clip_result"])
+    box = dialog.fill_box("options-box", ["add_marks", "add_text", "add_date", "clip_result", "clear_guides"])
     box.set_spacing(20)
     box.set_orientation(Gtk.Orientation.HORIZONTAL)
     dialog.fill_expander("expander", None, False, "options-box")
@@ -268,8 +275,9 @@ def run(procedure, run_mode, image, drawables, config, data):
     new_image.add_marks()
   if text:
     new_image.add_text(add_date)
+  clear_guides = config.get_property('clear_guides')
   new_canvas = Reproducer(new_image.get_image(), new_image.get_overlap(),
-                          canv_width, canv_height)
+                          canv_width, canv_height, clear_guides)
   if not new_canvas.can_fit_image():
       Gimp.message(_("The image is too big"))
       Gimp.PlugIn.quit()
@@ -318,6 +326,8 @@ class Clone (Gimp.PlugIn):
       procedure.add_boolean_argument ("add_date", _("Add date"), _("Add current date to text"),
                                    True, GObject.ParamFlags.READWRITE)
       procedure.add_boolean_argument ("clip_result", _("Clip to result"), _("Clip to result"),
+                                   True, GObject.ParamFlags.READWRITE)
+      procedure.add_boolean_argument ("clear_guides", _("Clear guides"), _("Remove guides from the output image"),
                                    True, GObject.ParamFlags.READWRITE)
       procedure.add_choice_argument ("format",  _("Paper format"), _("Paper format"),
                                    formats, "10x15", GObject.ParamFlags.READWRITE)
