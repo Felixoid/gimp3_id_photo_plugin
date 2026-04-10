@@ -120,7 +120,7 @@ class Copier (Gimp.PlugIn):
                                1, 10000, 200, GObject.ParamFlags.READWRITE)
     procedure.add_string_argument("guides", _("Guides (custom size)"), _("Guides coordinates: \"horizontal vertical horizontal vertical...\""),
                                  "", GObject.ParamFlags.READWRITE)
-    procedure.add_menu_path(_("<Image>/i_d photo"))
+    procedure.add_menu_path(_("<Image>/I_D Photo"))
     return procedure
 
 Gimp.main(Copier.__gtype__, sys.argv)

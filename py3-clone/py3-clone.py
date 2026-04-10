@@ -323,7 +323,7 @@ class Clone (Gimp.PlugIn):
                                    formats, "10x15", GObject.ParamFlags.READWRITE)
       procedure.add_string_argument ("save_dir", _("Archive directory"), _("Directory to save archived photos"),
                                    SAVE_DIR, GObject.ParamFlags.READWRITE)
-    procedure.add_menu_path (_("<Image>/i_d photo"))
+    procedure.add_menu_path (_("<Image>/I_D Photo"))
     return procedure
 
 Gimp.main(Clone.__gtype__, sys.argv)

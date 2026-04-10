@@ -50,5 +50,5 @@ msgstr "Направляющие (произв. размер)"
 msgid "Guides coordinates: \"horizontal vertical horizontal vertical...\""
 msgstr "Координаты направляющих: \"горизонтальная вертикальная горизонтальная вертикальная...\""
 
-msgid "<Image>/i_d photo"
-msgstr "<Image>/Фото на документы"
+msgid "<Image>/I_D Photo"
+msgstr "<Image>/Фото на _документы"

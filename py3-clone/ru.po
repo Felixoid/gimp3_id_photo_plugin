@@ -80,5 +80,5 @@ msgstr "Папка архива"
 msgid "Directory to save archived photos"
 msgstr "Папка для сохранения архивных фотографий"
 
-msgid "<Image>/i_d photo"
-msgstr "<Image>/Фото на документы"
+msgid "<Image>/I_D Photo"
+msgstr "<Image>/Фото на _документы"
