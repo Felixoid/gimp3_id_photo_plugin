@@ -6,5 +6,11 @@
 ![demo](./demo.gif)
 
 # Как установить
-Для Windows
-Скопировать папки в C:\Users\{ид пользователя}\AppData\Roaming\GIMP\3.0\plug-ins
+
+## Windows
+
+Скопировать папки в `C:\Users\{ид пользователя}\AppData\Roaming\GIMP\3.0\plug-ins`
+
+## Linux
+
+Скопировать папки в `~/.config/GIMP/3.0/plug-ins/`.

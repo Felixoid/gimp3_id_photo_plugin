@@ -6,5 +6,9 @@
 ![demo](./demo.gif)
 
 # How to install
-For windows
-copy folders from repo to C:\Users\{your_id}\AppData\Roaming\GIMP\3.0\plug-ins
+
+## Windows
+Copy folders from repo to `C:\Users\{your_id}\AppData\Roaming\GIMP\3.0\plug-ins`
+
+## Linux
+Copy folders from repo to `~/.config/GIMP/3.0/plug-ins/`.

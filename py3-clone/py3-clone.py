@@ -26,7 +26,7 @@ plug_in_proc = "plug-in-clone"
 
 plug_in_binary = "py3-clone"
 
-SAVE_DIR = f"{Path.home()}\Desktop\\arch_photo"
+SAVE_DIR = str(Path.home() / "Desktop" / "arch_photo")
 
 formats = Gimp.Choice.new()
 formats.add("unlimited", 0, _("Unlimited"), "for Unlimited")
@@ -55,14 +55,14 @@ class DecoratedImage:
     self.__overlap = 0
     self.__cross_size = 0
 
-  def save_image_to_archive(self):
+  def save_image_to_archive(self, save_dir):
     self.__image.flatten()
     self.__image.crop(self.__image.get_width(),
                       self.__image.get_height(), 0, 0)
     now = datetime.now()
     name = now.strftime("%Y-%m-%d-%H-%M-%S")
-    os.makedirs(SAVE_DIR,  exist_ok=True)
-    file_name = f"{SAVE_DIR}\\{name}.jpg"
+    os.makedirs(save_dir, exist_ok=True)
+    file_name = str(Path(save_dir) / f"{name}.jpg")
     file = Gio.File.new_for_path(file_name)
     self.__image.set_file(file)
     Gimp.file_save(Gimp.RunMode.NONINTERACTIVE,
@@ -75,8 +75,8 @@ class DecoratedImage:
     cross_layer = Gimp.Layer.new(self.__image, None, self.__cross_size, self.__cross_size,
                                 Gimp.ImageType.RGBA_IMAGE, 100, 0)
     for i in range(self.__cross_size):
-      cross_layer.set_pixel(i, self.__cross_size / 2, Gegl.Color.new(CROSS_COLOR))
-      cross_layer.set_pixel(self.__cross_size / 2, i, Gegl.Color.new(CROSS_COLOR))
+      cross_layer.set_pixel(i, self.__cross_size // 2, Gegl.Color.new(CROSS_COLOR))
+      cross_layer.set_pixel(self.__cross_size // 2, i, Gegl.Color.new(CROSS_COLOR))
     self.__image.insert_layer(cross_layer, None, 0)
     cross_layer.set_offsets(-offset, -offset)
     cross_layer = cross_layer.copy()
@@ -217,7 +217,7 @@ def run(procedure, run_mode, image, drawables, config, data):
     box2.set_orientation (Gtk.Orientation.HORIZONTAL)
     box.set_spacing(20)
     box.set_orientation (Gtk.Orientation.HORIZONTAL)
-    dialog.fill(["h_text", "v_text",  "box", "expander"])
+    dialog.fill(["h_text", "v_text",  "box", "expander", "save_dir"])
     if not dialog.run():
       dialog.destroy()
       return procedure.new_return_values(Gimp.PDBStatusType.CANCEL, None)
@@ -239,8 +239,9 @@ def run(procedure, run_mode, image, drawables, config, data):
   new_canvas = None
   result = 0
 
+  save_dir = config.get_property('save_dir')
   new_image = DecoratedImage(v_text, h_text, image)
-  new_image.save_image_to_archive()
+  new_image.save_image_to_archive(save_dir)
   if marks:
     new_image.add_marks()
   if text:
@@ -296,6 +297,8 @@ class Clone (Gimp.PlugIn):
                                    True, GObject.ParamFlags.READWRITE)
       procedure.add_choice_argument ("format",  _("Paper format"), _("Paper format"),
                                    formats, "A4", GObject.ParamFlags.READWRITE)
+      procedure.add_string_argument ("save_dir", _("Archive directory"), _("Directory to save archived photos"),
+                                   SAVE_DIR, GObject.ParamFlags.READWRITE)
     procedure.add_menu_path (_("<Image>/i_d photo"))
     return procedure
 
